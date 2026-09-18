@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../../features/packing/presentation/screens/packing_item_form_screen.dart';
 import '../../features/packing/presentation/screens/packing_list_screen.dart';
+import '../../features/templates/presentation/screens/apply_template_screen.dart';
+import '../../features/templates/presentation/screens/template_preview_screen.dart';
 import '../../features/trips/presentation/screens/trip_form_screen.dart';
 import '../theme/theme_controller.dart';
 import 'app_routes.dart';
-import 'feature_placeholder_page.dart';
 import 'home_shell.dart';
 import 'route_arguments.dart';
 import 'route_error_page.dart';
@@ -49,9 +50,17 @@ class AppRouter {
                 message: 'Open an item from a trip packing list.',
               );
       case AppRoutes.templatePreview:
-        return const FeaturePlaceholderPage(title: 'Template preview');
+        return arguments is TemplatePreviewArguments
+            ? TemplatePreviewScreen(arguments: arguments)
+            : const RouteErrorPage(
+                message: 'Open a template from your template list.',
+              );
       case AppRoutes.templateApplication:
-        return const FeaturePlaceholderPage(title: 'Apply template');
+        return arguments is TemplateApplicationArguments
+            ? ApplyTemplateScreen(arguments: arguments)
+            : const RouteErrorPage(
+                message: 'Choose a template before applying it.',
+              );
       default:
         return const RouteErrorPage();
     }

@@ -11,6 +11,8 @@ import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/error_state.dart';
 import '../../../trips/domain/trip.dart';
 import '../../../trips/presentation/widgets/trip_summary.dart';
+import '../../../templates/presentation/widgets/save_template_dialog.dart';
+import '../../../templates/providers/template_provider.dart';
 import '../../../trips/providers/trip_provider.dart';
 import '../../domain/packing_item.dart';
 import '../../providers/packing_list_provider.dart';
@@ -68,7 +70,7 @@ class _PackingListScreenState extends State<PackingListScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(trip?.name ?? 'Packing list'),
-          actions: [if (trip != null) _overflowMenu()],
+          actions: [if (trip != null) _overflowMenu(trip)],
         ),
         body: trip == null ? _missingTrip(tripsLoading) : _body(context, trip),
         floatingActionButton: trip == null
@@ -84,16 +86,22 @@ class _PackingListScreenState extends State<PackingListScreen> {
     );
   }
 
-  Widget _overflowMenu() => Consumer<PackingListProvider>(
+  Widget _overflowMenu(Trip trip) => Consumer<PackingListProvider>(
     builder: (context, provider, _) => PopupMenuButton<String>(
       key: const ValueKey('packing-list-menu'),
       tooltip: 'Packing list actions',
       onSelected: (value) {
-        if (value == 'clear-packed') {
+        if (value == 'save-template') {
+          unawaited(_saveAsTemplate(context, trip));
+        } else if (value == 'clear-packed') {
           unawaited(_clearPacked(context, provider.packedCount));
         }
       },
       itemBuilder: (context) => [
+        const PopupMenuItem(
+          value: 'save-template',
+          child: Text('Save as template'),
+        ),
         PopupMenuItem(
           value: 'clear-packed',
           enabled: provider.packedCount > 0,
@@ -249,6 +257,22 @@ class _PackingListScreenState extends State<PackingListScreen> {
     try {
       await _items.deleteItem(id);
       messenger.showSnackBar(SnackBar(content: Text('Deleted ${item.name}.')));
+    } on AppException catch (error) {
+      messenger.showSnackBar(SnackBar(content: Text(error.message)));
+    }
+  }
+
+  Future<void> _saveAsTemplate(BuildContext context, Trip trip) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final provider = context.read<TemplateProvider>();
+    final name = await SaveTemplateDialog.requestName(context, trip.name);
+    if (name == null) return;
+    try {
+      // The repository copies the trip's rows; the UI copies nothing.
+      await provider.saveTripAsTemplate(widget.tripId, name);
+      messenger.showSnackBar(
+        SnackBar(content: Text('Saved $name as a template.')),
+      );
     } on AppException catch (error) {
       messenger.showSnackBar(SnackBar(content: Text(error.message)));
     }
