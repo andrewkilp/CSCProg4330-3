@@ -21,6 +21,7 @@ class PackingItemRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Checkbox(
+          key: ValueKey('item-check-${item.id}'),
           value: item.isPacked,
           semanticLabel: 'Pack ${item.name}',
           onChanged: (value) => onPackedChanged(value ?? false),
