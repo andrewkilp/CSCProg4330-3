@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../theme/theme_controller.dart';
-import '../../features/trips/presentation/trip_list_placeholder.dart';
-import '../../features/templates/presentation/template_list_placeholder.dart';
+import '../../features/trips/presentation/screens/trip_list_screen.dart';
+import '../../features/templates/presentation/screens/template_list_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 
 class HomeShell extends StatefulWidget {
@@ -15,8 +15,8 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   int _index = 0;
   late final _pages = <Widget>[
-    const TripListPlaceholder(),
-    const TemplateListPlaceholder(),
+    const TripListScreen(),
+    const TemplateListScreen(),
     SettingsScreen(controller: widget.themeController),
   ];
   @override

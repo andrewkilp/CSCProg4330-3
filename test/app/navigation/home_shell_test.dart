@@ -1,18 +1,17 @@
+import 'package:csc4330prog3/app/navigation/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:csc4330prog3/app/packmate_app.dart';
-import 'package:csc4330prog3/app/navigation/app_routes.dart';
-import 'package:csc4330prog3/app/theme/theme_controller.dart';
 
-import '../theme/fake_theme_preferences.dart';
+import '../../support/app_harness.dart';
 
 void main() {
   testWidgets('shell, retained tabs, settings and route recovery', (
     tester,
   ) async {
-    final controller = ThemeController(FakeThemePreferences());
-    addTearDown(controller.dispose);
-    await tester.pumpWidget(PackMateApp(themeController: controller));
+    final harness = TestHarness();
+    harness.tripRepository.rows = [];
+    harness.templateRepository.rows = [];
+    await pumpApp(tester, harness: harness);
     expect(find.text('Your trips'), findsOneWidget);
     final trips = tester.element(find.text('Your trips'));
     await tester.tap(find.text('Templates'));
